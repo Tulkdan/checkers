@@ -1,13 +1,12 @@
 from models.Piece import Piece
 
 # TODO: validate when piece has eaten;
-# TODO: check if piece can move to certain location
 
 class Board:
     def __init__(self):
         self.BOARD = [
             [
-                '0' for y in range(8)
+                ' ' for y in range(8)
             ] for x in range(8)
         ]
         self.x_keys_qtd = 12
@@ -39,20 +38,26 @@ class Board:
     def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y):
         valid_position = self.check_walk_position_is_valid(piece_x, piece_y, pos_x, pos_y)
         is_empty = self.check_place_is_empty(pos_x, pos_y)
-        print(valid_position, is_empty)
-        if valid_position and is_empty:
+        positions_available_to = self.positions_available_to(piece_x, piece_y)
+        if valid_position and is_empty and [pos_x, pos_y] in positions_available_to:
             key = self.BOARD[piece_y][piece_x]
-            self.BOARD[piece_y][piece_x] = '0'
+            self.BOARD[piece_y][piece_x] = ' '
             self.BOARD[pos_y][pos_x] = Piece(key.format)
 
     def positions_available_to(self, piece_x, piece_y):
-        pass
-        # piece = self.BOARD[piece_x][piece_y]
-        # possible_movements = []
-        # if 
+        piece = self.BOARD[piece_y][piece_x]
+        available_positions = []
+        if not piece.has_crown():
+            if piece.format == 'x':
+                available_positions.append([piece_x + 1, piece_y + 1])
+                available_positions.append([piece_x - 1, piece_y + 1])
+            elif piece.format == 'y':
+                available_positions.append([piece_x + 1, piece_y - 1])
+                available_positions.append([piece_x - 1, piece_y - 1])
+        return available_positions
 
     def check_place_is_empty(self, pos_x, pos_y):
-        return self.BOARD[pos_y][pos_x] == '0'
+        return self.BOARD[pos_y][pos_x] == ' '
 
     def check_walk_position_is_valid(self, piece_x, piece_y, pos_x, pos_y):
         return piece_x != pos_x \
