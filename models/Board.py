@@ -5,25 +5,17 @@ from models.Piece import Piece
 class Board:
     def __init__(self):
         self.BOARD = [
-            [
-                ' ' for y in range(8)
-            ] for x in range(8)
+            [Piece('x'), ' ', Piece('x'), ' ', Piece('x'), ' ', Piece('x'), ' '],
+            [' ', Piece('x'), ' ', Piece('x'), ' ', Piece('x'), ' ', Piece('x')],
+            [Piece('x'), ' ', Piece('x'), ' ', Piece('x'), ' ', Piece('x'), ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+            [' ', Piece('y'), ' ', Piece('y'), ' ', Piece('y'), ' ', Piece('y')],
+            [Piece('y'), ' ', Piece('y'), ' ', Piece('y'), ' ', Piece('y'), ' '],
+            [' ', Piece('y'), ' ', Piece('y'), ' ', Piece('y'), ' ', Piece('y')],
         ]
         self.x_keys_qtd = 12
         self.y_keys_qtd = 12
-        self.create_keys(0, 3, Piece('x'))
-        self.create_keys(5, None, Piece('y'))
-
-    def create_keys(self, start, end, piece):
-        board_copy = self.BOARD[start:end]
-        for index_row, row in enumerate(board_copy):
-            for index_cell, cell in enumerate(row):
-                if index_row % 2 == 0:
-                    if index_cell % 2 == 0:
-                        board_copy[index_row][index_cell] = piece
-                else:
-                    if index_cell % 2 != 0:
-                        board_copy[index_row][index_cell] = piece
 
     def print_board(self):
         LINE = '|---' * 8
