@@ -1,7 +1,5 @@
 from models.Piece import Piece
 
-# TODO: validate when piece has eaten;
-
 class Board:
     def __init__(self):
         self.BOARD = [
@@ -53,9 +51,61 @@ class Board:
             print("try again")
             return
 
+        # TODO: validate if has eaten a piece
+        all_squares = self.get_all_pieces_in_diagonal(piece_x, piece_y, pos_x, pos_y)
+        if len(all_squares) and not self.remove_piece_if_had_jumped_houses(all_squares):
+            print("Couldn't remove piece")
+            print("Try again")
+            return
+
         key = self.BOARD[piece_y][piece_x]
         self.BOARD[piece_y][piece_x] = ' '
         self.BOARD[pos_y][pos_x] = Piece(key.format)
+
+    def remove_piece_if_had_jumped_houses(self, houses):
+        valid = []
+        for house in houses:
+            valid.append(self.check_place_is_empty(house[0], house[1]))
+
+        if valid.count(False) > 1:
+            return False
+
+        for house in houses:
+            if not self.check_place_is_empty(house[0], house[1]):
+                if self.get_piece_at_position(house[0], house[1]) == 'x':
+                    print("Removed a X piece")
+                    self.x_keys_qtd -= 1
+                else:
+                    print("Removed a Y piece")
+                    self.y_keys_qtd -= 1
+                self.BOARD[house[1]][house[0]] = ' '
+        return True
+
+
+    def get_all_pieces_in_diagonal(self, origin_x, origin_y, pos_x, pos_y):
+        diff_x = pos_x - origin_x
+        diff_y = pos_y - origin_y
+        fn = None
+        if diff_x > 0:
+            if diff_y > 0:
+                fn = lambda pos_x, pos_y: (pos_x + 1, pos_y + 1)
+            else:
+                fn = lambda pos_x, pos_y: (pos_x + 1, pos_y - 1)
+        else:
+            if diff_y > 0:
+                fn = lambda pos_x, pos_y: (pos_x - 1, pos_y + 1)
+            else:
+                fn = lambda pos_x, pos_y: (pos_x - 1, pos_y - 1)
+        new_origin_x, new_origin_y = fn(origin_x, origin_y)
+        return self.get_all_diagonal_places(new_origin_x, new_origin_y, pos_x, pos_y, fn)
+
+    def get_all_diagonal_places(self, origin_x, origin_y, target_x, target_y, fn):
+        if (origin_x == target_x and origin_y == target_y) or (origin_x < 0 or origin_y < 0):
+            return []
+        pos_x, pos_y = fn(origin_x, origin_y)
+        result = self.get_all_diagonal_places(pos_x, pos_y, target_x, target_y, fn)
+        result.append([origin_x, origin_y])
+        return result
 
     def get_position_available_piece_not_queen(self, pos_x, pos_y, piece):
         if self.check_place_is_empty(pos_x, pos_y):
