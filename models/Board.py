@@ -25,12 +25,17 @@ class Board:
             print(string)
         print(LINE + '|')
 
-    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y):
+    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y, player):
+        is_a_valid_piece1 = self.check_piece(player, piece_x, piece_y)
         valid_piece = not self.check_place_is_empty(piece_x, piece_y)
         valid_position = self.check_walk_position_is_valid(piece_x, piece_y, pos_x, pos_y)
         is_empty = self.check_place_is_empty(pos_x, pos_y)
         is_position_available = [pos_x, pos_y] in self.positions_available_to_walk(piece_x, piece_y)
 
+        if is_a_valid_piece1 is False:
+            print("Try again in is a valid piece")
+            return
+        
         if not valid_piece:
             print("There's no piece in the given position")
             print("Try again")
@@ -62,6 +67,15 @@ class Board:
         self.BOARD[piece_y][piece_x] = ' '
         self.BOARD[pos_y][pos_x] = Piece(key.format)
 
+    def check_piece(self, player, piece_x, piece_y):
+        key = self.BOARD[piece_y][piece_x]
+        piece1 = Piece('x')
+        if player == 1:
+            if piece1.format == key.format:
+                return True
+            else:
+                return False
+
     def remove_piece_if_had_jumped_houses(self, houses):
         valid = []
         for house in houses:
@@ -80,7 +94,6 @@ class Board:
                     self.y_keys_qtd -= 1
                 self.BOARD[house[1]][house[0]] = ' '
         return True
-
 
     def get_all_pieces_in_diagonal(self, origin_x, origin_y, pos_x, pos_y):
         diff_x = pos_x - origin_x
@@ -112,7 +125,6 @@ class Board:
             return [pos_x, pos_y]
         elif self.check_place_is_empty(pos_x + 1, pos_y + 1) and self.get_piece_at_position(pos_x, pos_y) != piece.format:
             return [pos_x + 1, pos_y + 1]
-
 
     def get_position_available(self, pos_x, pos_y, piece, fn):
         if not piece.has_crown():
