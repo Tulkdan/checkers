@@ -25,7 +25,7 @@ class Board:
             print(string)
         print(LINE + '|')
 
-    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y, player):
+    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y, player,turn):
         is_a_valid_piece1 = self.check_piece(player, piece_x, piece_y)
         valid_piece = not self.check_place_is_empty(piece_x, piece_y)
         valid_position = self.check_walk_position_is_valid(piece_x, piece_y, pos_x, pos_y)
@@ -33,7 +33,8 @@ class Board:
         is_position_available = [pos_x, pos_y] in self.positions_available_to_walk(piece_x, piece_y)
 
         if is_a_valid_piece1 is False:
-            print("Try again in is a valid piece")
+            print("It's not your piece")
+            print("Try again")
             return
         
         if not valid_piece:
@@ -66,12 +67,19 @@ class Board:
         key = self.BOARD[piece_y][piece_x]
         self.BOARD[piece_y][piece_x] = ' '
         self.BOARD[pos_y][pos_x] = Piece(key.format)
+        return True
 
     def check_piece(self, player, piece_x, piece_y):
         key = self.BOARD[piece_y][piece_x]
         piece1 = Piece('x')
+        piece2 = Piece('y')
         if player == 1:
             if piece1.format == key.format:
+                return True
+            else:
+                return False
+        else:
+            if piece2.format == key.format:
                 return True
             else:
                 return False
