@@ -35,34 +35,34 @@ class Board:
         if is_a_valid_piece1 is False:
             print("It's not your piece")
             print("Try again")
-            return
+            return False
         
         if not valid_piece:
             print("There's no piece in the given position")
             print("Try again")
-            return
+            return False
 
         if not valid_position:
             print("Invalid position to walk")
             print("Try again")
-            return
+            return False
 
         if not is_empty:
             print("There's a piece in the location that you want to move")
             print("Try again")
-            return
+            return False
 
         if not is_position_available:
             print("Invalid position to walk")
             print("try again")
-            return
+            return False
 
         # TODO: validate if has eaten a piece
         all_squares = self.get_all_pieces_in_diagonal(piece_x, piece_y, pos_x, pos_y)
         if len(all_squares) and not self.remove_piece_if_had_jumped_houses(all_squares):
             print("Couldn't remove piece")
             print("Try again")
-            return
+            return False
 
         key = self.BOARD[piece_y][piece_x]
         self.BOARD[piece_y][piece_x] = ' '
@@ -70,16 +70,16 @@ class Board:
         return True
 
     def check_piece(self, player, piece_x, piece_y):
-        key = self.BOARD[piece_y][piece_x]
-        piece1 = Piece('x')
-        piece2 = Piece('y')
+        key = self.BOARD[piece_y][piece_x]        
         if player == 1:
-            if piece1.format == key.format:
+            pieceP = Piece('x')
+            if pieceP.format == key.format:
                 return True
             else:
                 return False
         else:
-            if piece2.format == key.format:
+            pieceP = Piece('y')
+            if pieceP.format == key.format:
                 return True
             else:
                 return False
