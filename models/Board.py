@@ -25,7 +25,7 @@ class Board:
             print(string)
         print(LINE + '|')
 
-    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y, player,turn):
+    def walk_keys_to_pos(self, piece_x, piece_y, pos_x, pos_y, player):
         is_a_valid_piece1 = self.check_piece(player, piece_x, piece_y)
         valid_piece = not self.check_place_is_empty(piece_x, piece_y)
         valid_position = self.check_walk_position_is_valid(piece_x, piece_y, pos_x, pos_y)
@@ -40,29 +40,29 @@ class Board:
         if not valid_piece:
             print("There's no piece in the given position")
             print("Try again")
-            return False
+            return
 
         if not valid_position:
             print("Invalid position to walk")
             print("Try again")
-            return False
+            return
 
         if not is_empty:
             print("There's a piece in the location that you want to move")
             print("Try again")
-            return False
+            return
 
         if not is_position_available:
             print("Invalid position to walk")
             print("try again")
-            return False
+            return
 
         # TODO: validate if has eaten a piece
         all_squares = self.get_all_pieces_in_diagonal(piece_x, piece_y, pos_x, pos_y)
         if len(all_squares) and not self.remove_piece_if_had_jumped_houses(all_squares):
             print("Couldn't remove piece")
             print("Try again")
-            return False
+            return
 
         key = self.BOARD[piece_y][piece_x]
         self.BOARD[piece_y][piece_x] = ' '
@@ -71,7 +71,7 @@ class Board:
 
     def check_piece(self, player, piece_x, piece_y):
         key = self.BOARD[piece_y][piece_x]        
-        if player == 1:
+        if player == '1':
             pieceP = Piece('x')
             if pieceP.format == key.format:
                 return True
