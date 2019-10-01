@@ -1,4 +1,5 @@
 from models.Piece import Piece
+import os
 
 def message_error(message):
     print(f"Wait a minute, {message}")
@@ -23,17 +24,18 @@ class Board:
     def print_info(self, player):
         self.print_board()
         self.print_round()
-        print(f'--------- PLAYER {player.format} TURN ---------')
-
+        print(f'----------- PLAYER {player.format} TURN -----------')
 
     def print_round(self):
-        print(f'------------ ROUND {self.round} ------------')
+        print(f'-------------- ROUND {self.round} --------------')
 
     def print_board(self):
         output = ''
-        LINE = '|---' * 8
-        for row in self.BOARD:
-            string = '| '
+        LINE = '|---' * 9
+        print(LINE + '|')
+        print('|   | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |')
+        for index, row in enumerate(self.BOARD):
+            string = f'| {index} | '
             for cell in row:
                 string += '{} | '.format(cell)
             print(LINE + '|')
@@ -72,9 +74,10 @@ class Board:
             message_error("we couldn't remove the piece")
             return
 
-        key = self.BOARD[piece_y][piece_x]
+        piece = self.get_piece_at_position(piece_x, piece_y)
+        self.check_if_piece_receives_crown(piece, pos_y)
         self.BOARD[piece_y][piece_x] = ' '
-        self.BOARD[pos_y][pos_x] = Piece(key.format)
+        self.BOARD[pos_y][pos_x] = piece
         self.round += 1
 
     def check_player_piece(self, player, pos_x, pos_y):
@@ -146,12 +149,17 @@ class Board:
             return []
 
         new_pos_x, new_pos_y = fn(pos_x, pos_y)
-        return self.get_position_available(new_pos_x, new_pos_y, piece, fn).push([pos_x, pos_y])
+        next_position = self.get_position_available(new_pos_x, new_pos_y, piece, fn)
+        next_position.append([pos_x, pos_y])
+        return next_position
 
     def positions_available_to_walk(self, piece_x, piece_y):
         piece = self.BOARD[piece_y][piece_x]
         available_positions = []
-        if piece != ' ' and not piece.has_crown():
+        if piece == ' ':
+            return available_positions
+
+        if not piece.has_crown():
             if piece.format == 'x':
                 available_positions.append(self.get_position_available(
                     piece_x + 1,
@@ -179,12 +187,43 @@ class Board:
                     piece,
                     lambda pos_x, pos_y: (pos_x - 1, pos_y - 1)
                 ))
+
+        elif piece.has_crown():
+            available_positions.append(self.get_position_available(
+                piece_x + 1,
+                piece_y + 1,
+                piece,
+                lambda pos_x, pos_y: (pos_x + 1, pos_y + 1)
+            ))
+            available_positions.append(self.get_position_available(
+                piece_x - 1,
+                piece_y + 1,
+                piece,
+                lambda pos_x, pos_y: (pos_x - 1, pos_y + 1)
+            ))
+            available_positions.append(self.get_position_available(
+                piece_x + 1,
+                piece_y - 1,
+                piece,
+                lambda pos_x, pos_y: (pos_x + 1, pos_y - 1)
+            ))
+            available_positions.append(self.get_position_available(
+                piece_x - 1,
+                piece_y - 1,
+                piece,
+                lambda pos_x, pos_y: (pos_x - 1, pos_y - 1)
+            ))
+            available_positions = [val for sublist in available_positions for val in sublist]
+
         return available_positions
 
     def get_piece_at_position(self, pos_x, pos_y):
         return self.BOARD[pos_y][pos_x]
 
     def check_place_is_empty(self, pos_x, pos_y):
+        if not self.check_position_is_valid(pos_x, pos_y):
+            return False
+
         return self.BOARD[pos_y][pos_x] == ' '
 
     def check_walk_position_is_valid(self, piece_x, piece_y, pos_x, pos_y):
@@ -203,3 +242,8 @@ class Board:
             and pos_y < 8 \
             and pos_x > -1 \
             and pos_x < 8
+
+    def check_if_piece_receives_crown(self, piece, pos_y):
+        if (piece.format == 'x' and pos_y == 7) or (piece.format == 'y' and pos_y == 0):
+            print(f'has became a queen {piece.format} on {pos_y}')
+            piece.crown = True
